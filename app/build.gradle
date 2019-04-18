@@ -7,7 +7,7 @@ android {
         minSdkVersion 19
         targetSdkVersion 28
         versionCode 1
-        versionName "1.0"
+        versionName "1.0.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -23,10 +23,16 @@ android {
 
     signingConfigs{
         release {
-            storeFile file("/Users/joe/key")
-            storePassword "123456"
-            keyAlias "key"
-            keyPassword "123456"
+            storeFile file('../keystore.jks')
+            storePassword "cryptape2016@#"
+            keyAlias "trust"
+            keyPassword "cryptape2016@#"
+        }
+        debug {
+            storeFile file('../keystore.jks')
+            storePassword "cryptape2016@#"
+            keyAlias "trust"
+            keyPassword "cryptape2016@#"
         }
     }
 
