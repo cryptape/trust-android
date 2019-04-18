@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:id="@+id/tv_deviceName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:text="NKey8886676"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="12dp"
+        android:textSize="16sp"
+        android:textColor="#2D3035"/>
+
+    <TextView
+        android:id="@+id/tv_macAddress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/tv_deviceName"
+        app:layout_constraintLeft_toLeftOf="@id/tv_deviceName"
+        android:textSize="13sp"
+        android:text="80:DA:22:33:0C:11"/>
+
+    <Button
+        android:id="@+id/btn_connect"
+        android:layout_width="wrap_content"
+        android:layout_height="25dp"
+        app:layout_constraintBottom_toBottomOf="@id/tv_macAddress"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="4dp"
+        android:background="@drawable/btn_connect_bg"
+        android:contentDescription="@null"
+        android:text="Connect"
+        android:fontFamily="sans-serif"
+        android:textAllCaps="false"
+        android:textColor="@color/red"/>
+
+    <ProgressBar
+        android:id="@+id/pb_connect"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@id/tv_macAddress"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="7dp"
+        android:visibility="invisible"
+        style="?android:attr/progressBarStyleSmall" />
+
+    <View
+        android:id="@+id/tv_line"
+        app:layout_constraintTop_toBottomOf="@id/tv_macAddress"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/colorSplitLine"
+        android:layout_marginTop="12dp"/>
+
+    <TextView
+        android:id="@+id/tv_pk_label"
+        app:layout_constraintTop_toBottomOf="@id/tv_line"
+        app:layout_constraintLeft_toLeftOf="@id/tv_deviceName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:text="Public Key"
+        android:textColor="#2D3035"
+        android:layout_marginTop="12dp"/>
+
+    <ImageView
+        android:id="@+id/iv_copy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@id/tv_pk_label"
+        app:layout_constraintLeft_toRightOf="@id/tv_pk_label"
+        android:layout_marginLeft="8dp"
+        android:src="@drawable/icon_copy"
+        android:onClick="onClick"/>
+
+    <TextView
+        android:id="@+id/tv_pk"
+        app:layout_constraintTop_toBottomOf="@id/tv_pk_label"
+        app:layout_constraintLeft_toLeftOf="@id/tv_deviceName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textColor="#2D3035"
+        android:layout_marginTop="12dp"/>
+
+    <Button
+        android:id="@+id/btn_reset_pin"
+        android:layout_width="wrap_content"
+        android:layout_height="28dp"
+        app:layout_constraintTop_toBottomOf="@id/tv_pk"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="50dp"
+        android:layout_marginBottom="4dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/btn_reset_pin_bg"
+        android:contentDescription="@null"
+        android:text="Reset PIN"
+        android:fontFamily="sans-serif"
+        android:textAllCaps="false"
+        android:textColor="#2D3035" />
+
+    <Button
+        android:id="@+id/btn_unlock_pin"
+        android:layout_width="wrap_content"
+        android:layout_height="28dp"
+        app:layout_constraintTop_toTopOf="@id/btn_reset_pin"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="50dp"
+        android:layout_marginBottom="4dp"
+        android:background="@drawable/btn_reset_pin_bg"
+        android:contentDescription="@null"
+        android:text="Unlock PIN"
+        android:fontFamily="sans-serif"
+        android:textAllCaps="false"
+        android:textColor="#2D3035" />
+
+</android.support.constraint.ConstraintLayout>

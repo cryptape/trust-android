@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FBFCFE"
+    tools:context=".MainActivity">
+
+    <android.support.v7.widget.Toolbar xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/tb_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/toolbar_background"
+        app:contentInsetLeft="0dp"
+        app:contentInsetStart="0dp"
+        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+        <TextView
+            style="@style/TextAppearance.AppCompat.Widget.ActionBar.Title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/title"
+            android:textColor="#2D3035" />
+
+        <ImageView
+            android:id="@+id/iv_key_sets"
+            style="@style/TextAppearance.AppCompat.Widget.ActionBar.Title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginEnd="@dimen/margin_right"
+            android:contentDescription="@null"
+            android:src="@drawable/ic_favorites"
+            android:onClick="onClick"/>
+
+    </android.support.v7.widget.Toolbar>
+
+    <ImageButton
+        android:id="@+id/iv_gen_key"
+        android:layout_width="@dimen/main_button_width"
+        android:layout_height="@dimen/main_button_height"
+        android:layout_marginStart="@dimen/main_button_magin_horizontal"
+        android:layout_marginTop="@dimen/main_button_margin_vertical"
+        android:background="@drawable/btn_generate_key"
+        android:contentDescription="@null"
+        android:onClick="onClick"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tb_toolbar" />
+
+    <ImageView
+        android:id="@+id/iv_digital_sign"
+        android:layout_width="@dimen/main_button_width"
+        android:layout_height="@dimen/main_button_height"
+        android:layout_marginEnd="@dimen/main_button_magin_horizontal"
+        android:layout_marginStart="@dimen/main_button_magin_horizontal"
+        android:layout_marginTop="@dimen/main_button_margin_vertical"
+        android:background="@drawable/btn_digital_signature"
+        android:contentDescription="@null"
+        android:onClick="onClick"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tb_toolbar" />
+
+    <ImageView
+        android:id="@+id/iv_reset_key"
+        android:layout_width="@dimen/main_button_width"
+        android:layout_height="@dimen/main_button_height"
+        android:layout_marginStart="@dimen/main_button_magin_horizontal"
+        android:layout_marginTop="@dimen/main_button_margin_vertical"
+        android:background="@drawable/btn_reset_key"
+        android:contentDescription="@null"
+        android:onClick="onClick"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/iv_gen_key" />
+
+    <ImageView
+        android:id="@+id/iv_import_key"
+        android:layout_width="@dimen/main_button_width"
+        android:layout_height="@dimen/main_button_height"
+        android:layout_marginEnd="@dimen/main_button_magin_horizontal"
+        android:layout_marginStart="@dimen/main_button_magin_horizontal"
+        android:layout_marginTop="@dimen/main_button_margin_vertical"
+        android:background="@drawable/btn_input_key"
+        android:contentDescription="@null"
+        android:onClick="onClick"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/iv_digital_sign" />
+
+    <TextView
+        android:id="@+id/tv_devices"
+        app:layout_constraintTop_toBottomOf="@id/iv_reset_key"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginBottom="4dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="onClick"
+        android:text="Devices"
+        android:visibility="invisible"/>
+
+    <ProgressBar
+        android:id="@+id/pb_search"
+        app:layout_constraintTop_toTopOf="@id/tv_devices"
+        app:layout_constraintLeft_toRightOf="@id/tv_devices"
+        android:layout_marginStart="5dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminateDrawable="@drawable/icon_refresh"
+        style="?android:attr/progressBarStyleSmall"
+        android:onClick="onClick"
+        android:visibility="invisible"/>
+
+    <ListView
+        android:id="@+id/lv_devices"
+        app:layout_constraintTop_toBottomOf="@id/tv_devices"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="4dp"
+        app:layout_constraintHeight_default="percent"
+        app:layout_constraintHeight_percent="1"
+        android:background="@drawable/listview_background"
+        android:divider="@null"
+        android:visibility="invisible"/>
+
+</android.support.constraint.ConstraintLayout>

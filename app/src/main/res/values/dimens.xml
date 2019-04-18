@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="margin_right">8dp</dimen>
+    <dimen name="main_button_width">156dp</dimen>
+    <dimen name="main_button_height">112dp</dimen>
+    <dimen name="main_button_magin_horizontal">16dp</dimen>
+    <dimen name="main_button_margin_vertical">13dp</dimen>
+</resources>
