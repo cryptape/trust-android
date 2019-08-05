@@ -16,7 +16,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.broadthinking.ble.pursesdk.BlePurseSDK;
+import com.trustconnector.ble.pursesdk.BlePurseSDK;
 
 import java.util.List;
 
