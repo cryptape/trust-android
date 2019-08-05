@@ -2,7 +2,6 @@ package com.cryptape.trust;
 
 import android.app.Activity;
 import android.app.Application;
-import android.app.Dialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
@@ -16,7 +15,6 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
@@ -24,13 +22,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
-import android.view.Gravity;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
@@ -41,7 +34,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.broadthinking.ble.pursesdk.BlePurseSDK;
+import com.cryptape.trust.R;
+
+import libs.trustconnector.ble.pursesdk.BlePurseSDK;
 import com.yanzhenjie.permission.AndPermission;
 import com.yanzhenjie.permission.runtime.Permission;
 
@@ -57,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
     private Handler mHandler = new Handler();
     private List<BluetoothDevice> mListDevices = new ArrayList<>();
     private DeviceListAdapter deviceListAdapter;
-    Dialog keysetsDialog;
+    AlertDialog keysetsDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,17 +85,20 @@ public class MainActivity extends AppCompatActivity {
         createKeysetsDialog();//after initPurseSdk
     }
 
-    private void setPinCallback() {
+    private void setPinCallback(){
         deviceListAdapter.setPinCallback(new DeviceListAdapter.PinCallback() {
             @Override
             public void reset() {
-                Dialog dialog = initDialog(R.layout.dialog_reset_pin);
+                AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                View reseView = View.inflate(mContext, R.layout.dialog_reset_pin, null);
+                builder.setView(reseView);
+                AlertDialog dialog = builder.create();
                 dialog.setCancelable(false);
-                TextView tvOk = dialog.findViewById(R.id.tv_ok);
-                TextView tvCancel = dialog.findViewById(R.id.tv_cancel);
-                EditText edtCurrentPin = dialog.findViewById(R.id.edt_current_pin);
-                EditText edtNewPin = dialog.findViewById(R.id.edt_new_pin);
-                EditText edtRepeatPin = dialog.findViewById(R.id.edt_repeat_pin);
+                TextView tvOk = reseView.findViewById(R.id.tv_ok);
+                TextView tvCancel = reseView.findViewById(R.id.tv_cancel);
+                EditText edtCurrentPin = reseView.findViewById(R.id.edt_current_pin);
+                EditText edtNewPin = reseView.findViewById(R.id.edt_new_pin);
+                EditText edtRepeatPin = reseView.findViewById(R.id.edt_repeat_pin);
                 tvOk.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -108,70 +106,81 @@ public class MainActivity extends AppCompatActivity {
                         String newPin = edtNewPin.getText().toString();
                         String repeatPin = edtRepeatPin.getText().toString();
 
-                        if (TextUtils.isEmpty(currentPin) || TextUtils.isEmpty(newPin) || TextUtils.isEmpty(repeatPin)) {
+                        if(TextUtils.isEmpty(currentPin) || TextUtils.isEmpty(newPin) || TextUtils.isEmpty(repeatPin)){
                             toast("Please enter full information");
                             return;
                         }
-                        if (newPin.length() != 8) {
+                        if(newPin.length()!=8){
                             toast("New PIN should be 8 digits");
                             return;
                         }
-                        if (!newPin.equals(repeatPin)) {
+                        if(!newPin.equals(repeatPin)){
                             toast("The new PIN entered is not the same，please enter again");
                             return;
                         }
                         int verifyResult = BlePurseSDK.verifyPIN(currentPin.getBytes());
-                        if (verifyResult != 0x9000) {
+                        if(verifyResult != 0x9000){
                             toast("Please enter the correct current PIN");
                             return;
                         }
 
                         int result = BlePurseSDK.changePIN(newPin.getBytes());
-                        if (result == 0x9000) {
+                        if(result == 0x9000){
                             toast("Reset success");
-                        } else {
+                        }else {
                             toast("Reset fail");
                         }
                         dialog.dismiss();
                     }
                 });
-                tvCancel.setOnClickListener(v -> dialog.dismiss());
+                tvCancel.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                    }
+                });
                 dialog.show();
             }
 
             @Override
             public void unlock() {
-                if (deviceListAdapter.isConnect) {
-                    Dialog dialog = initDialog(R.layout.dialog_unlock_pin);
+                if(deviceListAdapter.isConnect){
+                    AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                    View unlockView = View.inflate(mContext, R.layout.dialog_unlock_pin, null);
+                    builder.setView(unlockView);
+                    AlertDialog dialog = builder.create();
                     dialog.setCancelable(false);
-                    TextView tvOk = dialog.findViewById(R.id.tv_ok);
-                    TextView tvCancel = dialog.findViewById(R.id.tv_cancel);
-                    EditText edtPuk = dialog.findViewById(R.id.edt_puk);
-                    EditText edtNewPin = dialog.findViewById(R.id.edt_new_pin);
-                    EditText edtRepeatPin = dialog.findViewById(R.id.edt_repeat_pin);
-                    tvOk.setOnClickListener(v -> {
-                        String puk = edtPuk.getText().toString();
-                        String newPin = edtNewPin.getText().toString();
-                        String repeatPin = edtRepeatPin.getText().toString();
-                        if (TextUtils.isEmpty(puk) || TextUtils.isEmpty(newPin) || TextUtils.isEmpty(repeatPin)) {
-                            toast("Please enter full information");
-                            return;
+                    TextView tvOk = unlockView.findViewById(R.id.tv_ok);
+                    TextView tvCancel = unlockView.findViewById(R.id.tv_cancel);
+                    EditText edtPuk = unlockView.findViewById(R.id.edt_puk);
+                    EditText edtNewPin = unlockView.findViewById(R.id.edt_new_pin);
+                    EditText edtRepeatPin = unlockView.findViewById(R.id.edt_repeat_pin);
+                    tvOk.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            String puk = edtPuk.getText().toString();
+                            String newPin = edtNewPin.getText().toString();
+                            String repeatPin = edtRepeatPin.getText().toString();
+                            if(TextUtils.isEmpty(puk) || TextUtils.isEmpty(newPin) || TextUtils.isEmpty(repeatPin)){
+                                toast("Please enter full information");
+                                return;
+                            }
+                            if(newPin.length()!=8){
+                                toast("New PIN should be 8 digits");
+                                return;
+                            }
+                            if(!newPin.equals(repeatPin)){
+                                toast("The new PIN entered is not the same，please enter again");
+                                return;
+                            }
+                            int result = BlePurseSDK.unblockPIN(Utils.parseHexString(puk),newPin.getBytes());
+                            if(result == 0x9000){
+                                toast("Unlock success");
+                            }else {
+                                toast("Unlock fail");
+                            }
+                            dialog.dismiss();
                         }
-                        if (newPin.length() != 8) {
-                            toast("New PIN should be 8 digits");
-                            return;
-                        }
-                        if (!newPin.equals(repeatPin)) {
-                            toast("The new PIN entered is not the same，please enter again");
-                            return;
-                        }
-                        int result = BlePurseSDK.unblockPIN(Utils.parseHexString(puk), newPin.getBytes());
-                        if (result == 0x9000) {
-                            toast("Unlock success");
-                        } else {
-                            toast("Unlock fail");
-                        }
-                        dialog.dismiss();
                     });
                     tvCancel.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -180,7 +189,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     });
                     dialog.show();
-                } else {
+                }else {
                     toast("Please connect the device first");
                 }
             }
@@ -188,42 +197,45 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initPurseSdk() {
-        SharedPreferences sp = getSharedPreferences("keysets", Context.MODE_PRIVATE);
-        String enc = sp.getString("enc", null);
-        if (enc == null) {
+        SharedPreferences sp = getSharedPreferences("keysets",Context.MODE_PRIVATE);
+        String enc = sp.getString("enc",null);
+        if(enc == null){
             SharedPreferences.Editor editor = sp.edit();
             String defEnc = "7404BE01D1C52CDD0DEA7BFAD37B5CD8";
             String defMac = "121C29F27546F9DCF25E3AB7C116EA61";
             String defDec = "7377C0D7F2F3A6561FABFD13DFC5E501";
-            editor.putString("enc", defEnc);
-            editor.putString("mac", defMac);
-            editor.putString("dec", defDec);
+            editor.putString("enc",defEnc);
+            editor.putString("mac",defMac);
+            editor.putString("dec",defDec);
             editor.commit();
             BlePurseSDK.initKey(defEnc, defMac, defDec);
-        } else {
-            String mac = sp.getString("mac", null);
-            String dec = sp.getString("dec", null);
+        }else {
+            String mac = sp.getString("mac",null);
+            String dec = sp.getString("dec",null);
             BlePurseSDK.initKey(enc, mac, dec);
         }
     }
 
     private void createKeysetsDialog() {
-        keysetsDialog = initDialog(R.layout.dialog_keysets);
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        View keysetsView = View.inflate(mContext, R.layout.dialog_keysets, null);
+        builder.setView(keysetsView);
+        keysetsDialog = builder.create();
         keysetsDialog.setCancelable(false);
 
-        EditText edtEnc = keysetsDialog.findViewById(R.id.edt_enc);
-        EditText edtMac = keysetsDialog.findViewById(R.id.edt_mac);
-        EditText edtDec = keysetsDialog.findViewById(R.id.edt_dec);
-        SharedPreferences sp = getSharedPreferences("keysets", Context.MODE_PRIVATE);
-        String enc = sp.getString("enc", null);
-        String mac = sp.getString("mac", null);
-        String dec = sp.getString("dec", null);
+        EditText edtEnc = keysetsView.findViewById(R.id.edt_enc);
+        EditText edtMac = keysetsView.findViewById(R.id.edt_mac);
+        EditText edtDec = keysetsView.findViewById(R.id.edt_dec);
+        SharedPreferences sp = getSharedPreferences("keysets",Context.MODE_PRIVATE);
+        String enc = sp.getString("enc",null);
+        String mac = sp.getString("mac",null);
+        String dec = sp.getString("dec",null);
 
         edtEnc.setText(enc);
         edtMac.setText(mac);
         edtDec.setText(dec);
 
-        Button btnOk = keysetsDialog.findViewById(R.id.btn_keysets_ok);
+        Button btnOk = keysetsView.findViewById(R.id.btn_keysets_ok);
         btnOk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -231,23 +243,23 @@ public class MainActivity extends AppCompatActivity {
                 String editedMac = edtMac.getText().toString();
                 String editedDec = edtDec.getText().toString();
 
-                if (editedEnc.length() != 32) {
+                if (editedEnc.length() != 32){
                     toast("invalide encKey");
                     return;
                 }
-                if (editedMac.length() != 32) {
+                if (editedMac.length() != 32){
                     toast("invalide macKey");
                     return;
                 }
-                if (editedDec.length() != 32) {
+                if (editedDec.length() != 32){
                     toast("invalide decKey");
                     return;
                 }
 
                 SharedPreferences.Editor editor = sp.edit();
-                editor.putString("enc", editedEnc);
-                editor.putString("mac", editedMac);
-                editor.putString("dec", editedDec);
+                editor.putString("enc",editedEnc);
+                editor.putString("mac",editedMac);
+                editor.putString("dec",editedDec);
                 editor.commit();
                 initPurseSdk();//re init
                 keysetsDialog.dismiss();
@@ -322,7 +334,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void importKey() {
+    private void importKey(){
         verifyPin(new VerifyPinCallback() {
             @Override
             public void onSuccess() {
@@ -331,75 +343,104 @@ public class MainActivity extends AppCompatActivity {
                     toastL("Already have a private key, please reset the private key and try again");
                     return;
                 }
-                Dialog dialog = initDialog(R.layout.dialog_import_key);
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                View importView = View.inflate(mContext, R.layout.dialog_import_key, null);
+                builder.setView(importView);
+                AlertDialog dialog = builder.create();
                 dialog.setCancelable(false);
-                EditText edtPrvKey = dialog.findViewById(R.id.edt_prvkey);
-                EditText edtPubKey = dialog.findViewById(R.id.edt_pubkey);
-                TextView tvOk = dialog.findViewById(R.id.tv_ok);
-                TextView tvCancel = dialog.findViewById(R.id.tv_cancel);
-                tvOk.setOnClickListener(v -> {
-                    String prvKey = edtPrvKey.getText().toString();
-                    String pubKey = edtPubKey.getText().toString();
+                EditText edtPrvKey = importView.findViewById(R.id.edt_prvkey);
+                EditText edtPubKey = importView.findViewById(R.id.edt_pubkey);
+                TextView tvOk = importView.findViewById(R.id.tv_ok);
+                TextView tvCancel = importView.findViewById(R.id.tv_cancel);
+                tvOk.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        String prvKey = edtPrvKey.getText().toString();
+                        String pubKey = edtPubKey.getText().toString();
 
-                    if (!Utils.isValidHex(prvKey) || !Utils.isValidHex(pubKey)) {
-                        toast("Please enter the right Private key and the corresponding public key");
-                        return;
-                    }
+                        if(!Utils.isValidHex(prvKey) || !Utils.isValidHex(pubKey)){
+                            toast("Please enter the right Private key and the corresponding public key");
+                            return;
+                        }
 
-                    int result = BlePurseSDK.importKey(Utils.parseHexString(prvKey), Utils.parseHexString(pubKey));
-                    if (result == 0x9000) {
-                        toast("import success");
-                        deviceListAdapter.tvPk.setText(pubKey);
-                    } else {
-                        toast("import fail");
+                        int result = BlePurseSDK.importKey(Utils.parseHexString(prvKey),Utils.parseHexString(pubKey));
+                        if(result == 0x9000){
+                            toast("import success");
+                            deviceListAdapter.tvPk.setText(pubKey);
+                        }else {
+                            toast("import fail");
+                        }
+                        dialog.dismiss();
                     }
-                    dialog.dismiss();
                 });
-                tvCancel.setOnClickListener(v -> dialog.dismiss());
+                tvCancel.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                    }
+                });
                 dialog.show();
             }
         });
     }
 
-    private void resetKey() {
-        verifyPin(() -> {
-            Dialog dialog = initDialog(R.layout.dialog_reset_key);
-            dialog.setCancelable(false);
-            TextView tvOk = dialog.findViewById(R.id.tv_ok);
-            TextView tvCancel = dialog.findViewById(R.id.tv_cancel);
-            tvOk.setOnClickListener(v -> {
-                int result = BlePurseSDK.resetKey();
-                if (result == 0x9000) {
-                    toast("Reset success");
-                    deviceListAdapter.tvPk.setText("");
-                } else {
-                    toast("Reset fail");
-                }
-                dialog.dismiss();
-            });
-            tvCancel.setOnClickListener(v -> dialog.dismiss());
-            dialog.show();
+    private void resetKey(){
+        verifyPin(new VerifyPinCallback() {
+            @Override
+            public void onSuccess() {
+                AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                View reseView = View.inflate(mContext, R.layout.dialog_reset_key, null);
+                builder.setView(reseView);
+                AlertDialog dialog = builder.create();
+                dialog.setCancelable(false);
+                TextView tvOk = reseView.findViewById(R.id.tv_ok);
+                TextView tvCancel = reseView.findViewById(R.id.tv_cancel);
+                tvOk.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int result = BlePurseSDK.resetKey();
+                        if(result == 0x9000){
+                            toast("Reset success");
+                            deviceListAdapter.tvPk.setText("");
+                        }else {
+                            toast("Reset fail");
+                        }
+                        dialog.dismiss();
+                    }
+                });
+                tvCancel.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                    }
+                });
+                dialog.show();
+            }
         });
     }
 
     private void genKey() {
-        verifyPin(() -> {
-            byte[] bytes = BlePurseSDK.getPublicKey();
-            if (bytes != null) {
-                toast("Already have a private key, please reset the private key and try again");
-                String pubkey = Utils.toHexString(bytes);
-                deviceListAdapter.tvPk.setText(pubkey);
-            } else {
-                int result = BlePurseSDK.generateKey();
-                if (result == 0x9000) {
-                    toast("Key Generated");
+        verifyPin(new VerifyPinCallback() {
+            @Override
+            public void onSuccess() {
+                byte[] bytes = BlePurseSDK.getPublicKey();
+                if (bytes != null) {
+                    toast("Already have a private key, please reset the private key and try again");
+                    String pubkey = Utils.toHexString(bytes);
+                    deviceListAdapter.tvPk.setText(pubkey);
                 } else {
-                    toast("Generate fail");
-                }
+                    int result = BlePurseSDK.generateKey();
+                    if (result == 0x9000) {
+                        toast("Key Generated");
+                    } else {
+                        toast("Generate fail");
+                    }
 
-                byte[] newPk = BlePurseSDK.getPublicKey();
-                if (newPk != null) {
-                    deviceListAdapter.tvPk.setText(Utils.toHexString(newPk));
+                    byte[] newPk = BlePurseSDK.getPublicKey();
+                    if(newPk != null){
+                        deviceListAdapter.tvPk.setText(Utils.toHexString(newPk));
+                    }
                 }
             }
         });
@@ -409,44 +450,63 @@ public class MainActivity extends AppCompatActivity {
         verifyPin(new VerifyPinCallback() {
             @Override
             public void onSuccess() {
-                Dialog dialog = initDialog(R.layout.dialog_gen_signature);
-
+                AlertDialog dialog;
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                View verifyPinView = View.inflate(mContext, R.layout.dialog_gen_signature, null);
+                builder.setView(verifyPinView);
+                dialog = builder.create();
                 dialog.setCancelable(false);
-                TextView tvOk = dialog.findViewById(R.id.tv_ok);
-                TextView tvCancel = dialog.findViewById(R.id.tv_cancel);
-                EditText edtData = dialog.findViewById(R.id.edt_data);
-                tvOk.setOnClickListener(view -> {
-                    String data = edtData.getText().toString();
-                    boolean isHex = Utils.isValidHex(data);
-                    if (!isHex) {
-                        toast("Please enter the right format");
-                        return;
-                    }
-                    byte[] signature = BlePurseSDK.sign(Utils.parseHexString(data));
-                    if (signature != null) {
-                        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                        View sigView = View.inflate(mContext, R.layout.dialog_signature, null);
-                        builder.setView(sigView);
-                        AlertDialog dialogSig = builder.create();
-                        dialogSig.setCancelable(false);
-                        TextView tvOk1 = sigView.findViewById(R.id.tv_ok);
-                        TextView tvSig = sigView.findViewById(R.id.tv_sig);
-                        tvSig.setText(Utils.toHexString(signature));
-                        tvSig.setOnClickListener(v -> {
-                            String sig = tvSig.getText().toString();
-                            ClipboardManager cm = (ClipboardManager) mContext.getSystemService(Context.CLIPBOARD_SERVICE);
-                            ClipData mClipData = ClipData.newPlainText("trust", sig);
-                            cm.setPrimaryClip(mClipData);
-                            toast("Digital signature copied");
-                        });
-                        tvOk1.setOnClickListener(v -> dialogSig.dismiss());
-                        dialog.dismiss();
-                        dialogSig.show();
-                    } else {
-                        toast("Generate signature failed");
+                TextView tvOk = verifyPinView.findViewById(R.id.tv_ok);
+                TextView tvCancel = verifyPinView.findViewById(R.id.tv_cancel);
+                EditText edtData = verifyPinView.findViewById(R.id.edt_data);
+                tvOk.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        String data = edtData.getText().toString();
+                        boolean isHex = Utils.isValidHex(data);
+                        if(!isHex){
+                            toast("Please enter the right format");
+                            return;
+                        }
+                        byte[] signature = BlePurseSDK.sign(Utils.parseHexString(data));
+                        if (signature != null){
+                            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                            View sigView = View.inflate(mContext, R.layout.dialog_signature, null);
+                            builder.setView(sigView);
+                            AlertDialog dialogSig = builder.create();
+                            dialogSig.setCancelable(false);
+                            TextView tvOk = sigView.findViewById(R.id.tv_ok);
+                            TextView tvSig = sigView.findViewById(R.id.tv_sig);
+                            tvSig.setText(Utils.toHexString(signature));
+                            tvSig.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    String sig = tvSig.getText().toString();
+                                    ClipboardManager cm = (ClipboardManager) mContext.getSystemService(Context.CLIPBOARD_SERVICE);
+                                    ClipData mClipData = ClipData.newPlainText("trust", sig);
+                                    cm.setPrimaryClip(mClipData);
+                                    toast("Digital signature copied");
+                                }
+                            });
+                            tvOk.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    dialogSig.dismiss();
+                                }
+                            });
+                            dialog.dismiss();
+                            dialogSig.show();
+                        }else {
+                            toast("Generate signature failed");
+                        }
                     }
                 });
-                tvCancel.setOnClickListener(view -> dialog.dismiss());
+                tvCancel.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        dialog.dismiss();
+                    }
+                });
                 dialog.show();
             }
         });
@@ -454,11 +514,15 @@ public class MainActivity extends AppCompatActivity {
 
     private void verifyPin(VerifyPinCallback callback) {
         if (deviceListAdapter.isConnect) {
-            Dialog dialog = initDialog(R.layout.dialog_verify_pin);
+            AlertDialog dialog;
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+            View verifyPinView = View.inflate(mContext, R.layout.dialog_verify_pin, null);
+            builder.setView(verifyPinView);
+            dialog = builder.create();
             dialog.setCancelable(false);
-            TextView tvOk = dialog.findViewById(R.id.tv_ok);
-            TextView tvCancel = dialog.findViewById(R.id.tv_cancel);
-            EditText edtPIn = dialog.findViewById(R.id.edt_pin);
+            TextView tvOk = verifyPinView.findViewById(R.id.tv_ok);
+            TextView tvCancel = verifyPinView.findViewById(R.id.tv_cancel);
+            EditText edtPIn = verifyPinView.findViewById(R.id.edt_pin);
             tvOk.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -581,8 +645,7 @@ public class MainActivity extends AppCompatActivity {
     private void toast(String msg) {
         Toast.makeText(mContext, msg, Toast.LENGTH_SHORT).show();
     }
-
-    private void toastL(String msg) {
+    private void toastL(String msg){
         Toast.makeText(mContext, msg, Toast.LENGTH_LONG).show();
     }
 
@@ -653,7 +716,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void scan() {
-        requestBle(() -> startScanning());
+        requestBle(new RequestBleCallback() {
+            @Override
+            public void onOpen() {
+                startScanning();
+            }
+        });
     }
 
     private long mExitTime;
@@ -672,26 +740,10 @@ public class MainActivity extends AppCompatActivity {
         return super.onKeyDown(keyCode, event);
     }
 
-    private boolean isValideKey(String key) {
-        if (key.length() != 32) {
+    private boolean isValideKey(String key){
+        if(key.length() != 32){
             return false;
         }
         return Utils.isValidHex(key);
-    }
-
-    private Dialog initDialog(@LayoutRes int resource) {
-        Dialog dialog = new Dialog(this);
-        LayoutInflater layoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View verifyPinView = layoutInflater.inflate(resource, null);
-        dialog.addContentView(verifyPinView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        Window window = dialog.getWindow();
-        window.setGravity(Gravity.CENTER);
-        WindowManager manager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
-        DisplayMetrics dm = new DisplayMetrics();
-        manager.getDefaultDisplay().getMetrics(dm);
-        WindowManager.LayoutParams lp = window.getAttributes();
-        lp.width = dm.widthPixels;
-        window.setAttributes(lp);
-        return dialog;
     }
 }
