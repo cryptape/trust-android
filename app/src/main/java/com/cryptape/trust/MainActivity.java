@@ -34,7 +34,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.trustconnector.ble.pursesdk.BlePurseSDK;
+import com.cryptape.trust.R;
+
+import libs.trustconnector.ble.pursesdk.BlePurseSDK;
 import com.yanzhenjie.permission.AndPermission;
 import com.yanzhenjie.permission.runtime.Permission;
 

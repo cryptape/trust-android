@@ -1,0 +1,6 @@
+package libs.trustconnector.scdp.smartcard;
+
+public interface APDUChecker
+{
+    void check(final APDU p0) throws APDUCheckException;
+}

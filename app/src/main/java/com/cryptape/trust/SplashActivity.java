@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.KeyEvent;
 
+import com.cryptape.trust.R;
+
 public class SplashActivity extends Activity {
     @SuppressLint("HandlerLeak")
     private Handler handler = new Handler()
